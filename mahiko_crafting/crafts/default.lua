@@ -134,3 +134,32 @@ register("microburst", {
     "default:junglesapling 4",
     "default:sword_steel",
 })
+
+register("replenishment", {
+    ESSENCE_ITEM .. " 4",
+    "default:apple 20",
+})
+
+register("rejuvenate", {
+    ESSENCE_ITEM .. " 4",
+    "default:apple 20",
+    "default:blueberries 20",
+})
+
+register("vampire", {
+    ESSENCE_ITEM .. " 6",
+    "default:apple 20",
+    "default:stonebrick 10",
+})
+
+register("leech", {
+    ESSENCE_ITEM .. " 6",
+    "default:apple 20",
+    "default:mossycobble 15",
+})
+
+register("mobile_medkit", {
+    ESSENCE_ITEM .. " 12",
+    "default:apple 64",
+    "default:stone_block 5",
+})

@@ -1,5 +1,13 @@
 local ITEM_SIZE = 1.2
 
+local function sortSpells(i)
+    local spells = mahiko_spells.getSpellsInCategory(i)
+    table.sort(spells, function (a, b)
+        return a:lower() < b:lower()
+    end)
+    return spells
+end
+
 local gui = flow.widgets
 local formspec = flow.make_gui(function(player, ctx)
     local vbox = gui.VBox{
@@ -7,8 +15,7 @@ local formspec = flow.make_gui(function(player, ctx)
     }
     ctx.form.category = ctx.form.category or 1
 
-    local i = math.random(1, 5)
-    local spells = mahiko_spells.getSpellsInCategory(ctx.form.category)
+    local spells = sortSpells(ctx.form.category)
     for _, spell in ipairs(spells) do
         local itemstack = ItemStack(spell)
         local hbox = gui.HBox{}
