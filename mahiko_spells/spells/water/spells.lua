@@ -13,6 +13,7 @@ local WHIRLPOOL_VEL_YMIN = -18
 local WHIRLPOOL_VEL_YMAX = -25
 local BREATHABILITY_INTERVAL = 1
 local BREATHABILITY_OFFSET_Y = 0.75
+local FROSTBITE_NODE = {name = "mahiko_spells:powdered_snow"}
 local FROSTBITE_TRAP_WIDTH = 5
 local FROSTBITE_TRAP_HEIGHT = 3
 local FROSTBITE_TRAP_MIN = 70
@@ -188,12 +189,12 @@ mahiko_spells.registerSimpleSpell("condenser", {
     end,
 })
 
-local function tryPowderedSnow(pos)
-    --core.set_node(pos, {name = "mahiko_spells:powdered_snow"})
-    core.place_node(pos, {name = "mahiko_spells:powdered_snow"})
-    local timer = core.get_node_timer(pos)
-    local timeout = math.random(FROSTBITE_TRAP_MIN, FROSTBITE_TRAP_MAX) / 10
-    timer:start(timeout)
+local function tryPowderedSnow(pos, placer)
+    if mahiko_spells.earth.placeNode(pos, FROSTBITE_NODE, placer) then
+        local timer = core.get_node_timer(pos)
+        local timeout = math.random(FROSTBITE_TRAP_MIN, FROSTBITE_TRAP_MAX) / 10
+        timer:start(timeout)
+    end
 end
 
 mahiko_spells.registerSimpleSpell("frostbite", {
@@ -207,7 +208,7 @@ mahiko_spells.registerSimpleSpell("frostbite", {
     _cooldown = {8, 15},
     on_use = function(itemstack, user, pointed_thing)
         if pointed_thing.type == "node" then
-            tryPowderedSnow(pointed_thing.above)
+            tryPowderedSnow(pointed_thing.above, user)
             return true
         end
         if pointed_thing.type == "object" then
@@ -218,9 +219,9 @@ mahiko_spells.registerSimpleSpell("frostbite", {
                 y = math.floor(pos.y),
                 z = math.floor(pos.z),
             }
-            tryPowderedSnow(pos)
+            tryPowderedSnow(pos, user)
             pos.y = pos.y + 1
-            tryPowderedSnow(pos)
+            tryPowderedSnow(pos, user)
         end
     end,
     _on_rightclick = function(itemstack, user, pointed_thing)
@@ -229,14 +230,13 @@ mahiko_spells.registerSimpleSpell("frostbite", {
         end
 
         local pos = pointed_thing.above
-
         local positions = mahiko_spells.water.getNodes(user, pos, FROSTBITE_TRAP_WIDTH, FROSTBITE_TRAP_HEIGHT)
         table.sort(positions, function(a, b)
             return a.y < b.y
         end)
 
         for i, npos in ipairs(positions) do
-            core.after(0.25 * i, tryPowderedSnow, npos)
+            core.after(0.065 * (i - 1), tryPowderedSnow, npos, user)
         end
 
         return true

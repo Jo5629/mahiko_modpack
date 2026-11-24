@@ -61,6 +61,19 @@ function mahiko_spells.earth.getFacingNodes(user, pointed_thing, w, h)
     return positions
 end
 
+function mahiko_spells.earth.placeNode(pos, node, placer)
+    local oldnode = core.get_node_or_nil(pos)
+    local oldnodeDef = oldnode and core.registered_nodes[oldnode.name]
+    if not oldnode or not oldnodeDef.buildable_to then
+        return false
+    end
+    if placer and core.is_protected(pos, placer:get_player_name()) then
+        return false
+    end
+    core.set_node(pos, node)
+    return true
+end
+
 local function isInGroup(name, group)
     return core.get_item_group(name, group) > 0
 end

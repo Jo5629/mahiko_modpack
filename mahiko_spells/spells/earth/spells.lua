@@ -182,14 +182,14 @@ mahiko_spells.registerSimpleSpell("contaminator", {
         for x = pos1.x, pos2.x do
         for z = pos1.z, pos2.z do
             local npos = vector.new(x, y, z)
-            core.after(0.025 * i, function(npos)
-                local success = core.place_node(npos, {name = CONTAMINATED_DIRT})
+            core.after(0.025 * i, function(npos, placer)
+                local success = mahiko_spells.earth.placeNode(pos, {name = CONTAMINATED_DIRT}, placer)
                 if success then
                     local timer = core.get_node_timer(npos)
                     local timeout = math.random(CONTAMINATOR_TRAP_MIN, CONTAMINATOR_TRAP_MAX) / 10
                     timer:start(timeout)
                 end
-            end, npos)
+            end, npos, user)
             i = i + 1
         end
         end
