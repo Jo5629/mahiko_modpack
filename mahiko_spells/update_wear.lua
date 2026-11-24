@@ -63,11 +63,17 @@ local function updateWear(player, id, timeLeft, totalTime, listname, mode)
     local newWear = 0
     local percent = timeLeft / totalTime
     if mode == "up" then
-        --percent = timeLeft / cooldown
         newWear = math.floor(65535 * percent)
     elseif mode == "down" then
-        --percent = timeLeft / use_duration
         newWear = math.floor(65535 * (1 - percent))
+    end
+
+    local meta = stack:get_meta()
+    local color = meta:get_string("color")
+    if newWear == 0 then
+        meta:set_string("color", "")
+    elseif color == "" then
+        meta:set_string("color", "#E65E60")
     end
 
     stack:set_wear(newWear)
@@ -101,5 +107,5 @@ core.register_globalstep(function(dtime)
     end)
     cooldowns:clearCachedTimers()
 
-    elapsed = 0
+    elapsed = elapsed - UPDATE_INTERVAL
 end)

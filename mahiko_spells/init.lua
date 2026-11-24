@@ -6,9 +6,10 @@ mahiko_spells = {
         EARTH = "#C24802",
         WIND = "#BFBFBF",
         HEALING = "#15E8CF",
+        OTHER = "#D100D1",
         --ELECTRIC = "#E3C609",
     },
-    ELEMENTS = {"fire", "water", "earth", "wind", "healing"},
+    ELEMENTS = {"fire", "water", "earth", "wind", "healing", "other"},
     registered_spells = {},
 }
 

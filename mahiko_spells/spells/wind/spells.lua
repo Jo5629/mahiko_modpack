@@ -1,5 +1,6 @@
 local COLORS = mahiko_spells.COLORS
-local ELEMENT_INT = 4
+local COLORIZE = core.colorize
+local ELEMENT_INT = mahiko_spells.intFromCategory("wind")
 local DEFAULT_SPELL_ICON = "mahiko_spells_element_wind.png"
 local GRAVITY_WEIGHTLESSNESS = 0.2
 local PROPULSION_MULT = 15
@@ -20,7 +21,7 @@ end
 mahiko_spells.registerFancySpell("weightlessness", {
     groups = {mahiko_element = ELEMENT_INT},
     description = table.concat({
-        core.colorize(COLORS.WIND, "Weightlessness"),
+        COLORIZE(COLORS.WIND, "Weightlessness"),
         "Left-click: zero gravity for 12 seconds.",
     }, "\n"),
     inventory_image = DEFAULT_SPELL_ICON,
@@ -46,7 +47,7 @@ mahiko_spells.registerFancySpell("weightlessness", {
 mahiko_spells.registerSimpleSpell("propulsion", {
     groups = {mahiko_element = ELEMENT_INT},
     description = table.concat({
-        core.colorize(COLORS.WIND, "Propulsion"),
+        COLORIZE(COLORS.WIND, "Propulsion"),
         "Left-click: Dash",
         "Right-click: High Jump",
     }, "\n"),
@@ -68,7 +69,7 @@ mahiko_spells.registerSimpleSpell("propulsion", {
 mahiko_spells.registerSimpleSpell("whirlwind", {
     groups = {mahiko_element = ELEMENT_INT},
     description = table.concat({
-        core.colorize(COLORS.WIND, "Whirlwind"),
+        COLORIZE(COLORS.WIND, "Whirlwind"),
         "Left-click on a entity: launch the entity away from you.",
         "Right-click on a entity: launch the entity up.",
     }, "\n"),
@@ -112,7 +113,7 @@ mahiko_spells.registerSimpleSpell("whirlwind", {
 mahiko_spells.registerSimpleSpell("microburst", {
     groups = {mahiko_element = ELEMENT_INT},
     description = table.concat({
-        core.colorize(COLORS.WIND, "Microburst"),
+        COLORIZE(COLORS.WIND, "Microburst"),
         "Left-click: launch a precise, high-damage gust of wind.",
         --"Right-click: launch a precise gust of wind that pushes away players.",
     }, "\n"),

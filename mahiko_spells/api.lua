@@ -17,6 +17,15 @@ function mahiko_spells.getSpellsInCategory(i)
     return mahiko_spells.registered_spells[i]
 end
 
+function mahiko_spells.intFromCategory(name)
+    for i, category in ipairs(categories) do
+        if category == name then
+            return i
+        end
+    end
+    return -1
+end
+
 local function registerRawSpell(name, def)
     if not name:match(":") then
         name = "mahiko_spells:" .. name

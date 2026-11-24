@@ -2,7 +2,7 @@ local ITEM_SIZE = 1.2
 
 local function sortSpells(i)
     local spells = mahiko_spells.getSpellsInCategory(i)
-    table.sort(spells, function (a, b)
+    table.sort(spells, function(a, b)
         return a:lower() < b:lower()
     end)
     return spells

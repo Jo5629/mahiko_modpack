@@ -1,7 +1,8 @@
 local COLORS = mahiko_spells.COLORS
-local ELEMENT_INT = 3
+local COLORIZE = core.colorize
+local ELEMENT_INT = mahiko_spells.intFromCategory("earth")
 local DEFAULT_SPELL_ICON = "mahiko_spells_element_earth.png"
-local POISONED_DIRT = "mahiko_spells:contaminated_dirt"
+local CONTAMINATED_DIRT = "mahiko_spells:contaminated_dirt"
 local HURLER_PPOS_OFFSET_Y = 1.15
 local HURLER_PPOS_MULT = 1.5
 local HURLER_VELOCITY_MULT = 30
@@ -27,9 +28,9 @@ local posCache = {}
 mahiko_spells.registerSimpleSpell("hurler", {
     groups = {mahiko_element = ELEMENT_INT},
     description = table.concat({
-        core.colorize(COLORS.EARTH, "Hurler"),
-        "Left-click: throw a fast-moving, explosive",
-        "block in the direction you are facing.",
+        COLORIZE(COLORS.EARTH, "Hurler"),
+        "Left-click: throw a fast-moving,",
+        "explosive block.",
         "Right-click: select the block to throw."
     }, "\n"),
     inventory_image = DEFAULT_SPELL_ICON,
@@ -80,7 +81,7 @@ mahiko_spells.registerSimpleSpell("hurler", {
 mahiko_spells.registerSimpleSpell("masonry", {
     groups = {mahiko_element = ELEMENT_INT},
     description = table.concat({
-        core.colorize(COLORS.EARTH, "Masonry"),
+        COLORIZE(COLORS.EARTH, "Masonry"),
         "Left-click: build a four-block tall pillar.",
         "Right-click: build a five by four wall."
     }, "\n"),
@@ -108,7 +109,7 @@ mahiko_spells.registerSimpleSpell("masonry", {
         for i = 0, offset - 1 do
             local old = {x = top.x, y = top.y - i, z = top.z}
             local new = {x = top.x, y = old.y + offset, z = top.z}
-            core.set_node(new, core.get_node(old))
+            core.place_node(new, core.get_node(old))
             core.remove_node(old)
         end
         return true
@@ -120,7 +121,7 @@ mahiko_spells.registerSimpleSpell("masonry", {
 
         for oldpos, node in pairs(mahiko_spells.earth.getFacingNodes(user, pointed_thing)) do
             oldpos.y = oldpos.y + MASONRY_HEIGHT
-            core.set_node(oldpos, node)
+            core.place_node(oldpos, node)
         end
         return true
     end,
@@ -129,7 +130,7 @@ mahiko_spells.registerSimpleSpell("masonry", {
 mahiko_spells.registerSimpleSpell("excavator", {
     groups = {mahiko_element = ELEMENT_INT},
     description = table.concat({
-        core.colorize(COLORS.EARTH, "Excavator"),
+        COLORIZE(COLORS.EARTH, "Excavator"),
         "Left-click: dig a 5 by 3 hole.",
     }, "\n"),
     inventory_image = DEFAULT_SPELL_ICON,
@@ -160,7 +161,7 @@ mahiko_spells.registerSimpleSpell("excavator", {
 mahiko_spells.registerSimpleSpell("contaminator", {
     groups = {mahiko_element = ELEMENT_INT},
     description = table.concat({
-        core.colorize(COLORS.EARTH, "Contaminator"),
+        COLORIZE(COLORS.EARTH, "Contaminator"),
         "Left-click on an entity: trap the entity in Poisoned Dirt.",
         "Right-click on a node: place a block of Poisoned Dirt."
     }, "\n"),
@@ -176,20 +177,20 @@ mahiko_spells.registerSimpleSpell("contaminator", {
         --pos.y = pos.y + 1
         local pos1 = vector.subtract(pos, CONTAMINATOR_OFFSET)
         local pos2 = vector.add(pos, CONTAMINATOR_OFFSET)
-        for x = pos1.x, pos2.x do
+        local i = 0
         for y = pos1.y, pos2.y do
+        for x = pos1.x, pos2.x do
         for z = pos1.z, pos2.z do
-            local npos = {x = x, y = y, z = z}
-            local node = core.get_node(npos)
-            if node.name ~= "air" and not mahiko_spells.earth.isEarthNode(npos) then
-                goto continue
-            end
-            core.dig_node(npos)
-            core.set_node(npos, {name = POISONED_DIRT})
-            local timer = core.get_node_timer(npos)
-            local timeout = math.random(CONTAMINATOR_TRAP_MIN, CONTAMINATOR_TRAP_MAX) / 10
-            timer:start(timeout)
-            ::continue::
+            local npos = vector.new(x, y, z)
+            core.after(0.025 * i, function(npos)
+                local success = core.place_node(npos, {name = CONTAMINATED_DIRT})
+                if success then
+                    local timer = core.get_node_timer(npos)
+                    local timeout = math.random(CONTAMINATOR_TRAP_MIN, CONTAMINATOR_TRAP_MAX) / 10
+                    timer:start(timeout)
+                end
+            end, npos)
+            i = i + 1
         end
         end
         end
@@ -201,18 +202,20 @@ mahiko_spells.registerSimpleSpell("contaminator", {
         end
 
         local pos = pointed_thing.above
-        core.set_node(pos, {name = POISONED_DIRT})
-        local timer = core.get_node_timer(pos)
-        local timeout = math.random(CONTAMINATOR_PLACE_MIN, CONTAMINATOR_PLACE_MAX) / 10
-        timer:start(timeout)
-        return true
+        local success = core.place_node(pos, {name = CONTAMINATED_DIRT})
+        if success then
+            local timer = core.get_node_timer(pos)
+            local timeout = math.random(CONTAMINATOR_PLACE_MIN, CONTAMINATOR_PLACE_MAX) / 10
+            timer:start(timeout)
+            return true
+        end
     end,
 })
 
 mahiko_spells.registerSimpleSpell("molerat", {
     groups = {mahiko_element = ELEMENT_INT},
     description = table.concat({
-        core.colorize(COLORS.EARTH, "Mole Rat"),
+        COLORIZE(COLORS.EARTH, "Mole Rat"),
         "Left-click on an node: dig four blocks forwards.",
         "Right-click on a node: dig four blocks deep."
     }, "\n"),

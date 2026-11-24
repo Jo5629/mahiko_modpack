@@ -1,5 +1,6 @@
 local COLORS = mahiko_spells.COLORS
-local ELEMENT_INT = 2
+local COLORIZE = core.colorize
+local ELEMENT_INT = mahiko_spells.intFromCategory("water")
 local DEFAULT_SPELL_ICON = "mahiko_spells_element_water.png"
 local BARRACUDA_FLUIDITY_MULT = math.huge
 local BARRACUDA_FLUIDITY_OLD = 1
@@ -12,16 +13,10 @@ local WHIRLPOOL_VEL_YMIN = -18
 local WHIRLPOOL_VEL_YMAX = -25
 local BREATHABILITY_INTERVAL = 1
 local BREATHABILITY_OFFSET_Y = 0.75
-
-local function inWater(pos)
-    pos = {
-        x = math.ceil(pos.x),
-        y = math.ceil(pos.y),
-        z = math.ceil(pos.z),
-    }
-    local name = core.get_node(pos).name
-    return name:match("water")
-end
+local FROSTBITE_TRAP_WIDTH = 5
+local FROSTBITE_TRAP_HEIGHT = 3
+local FROSTBITE_TRAP_MIN = 70
+local FROSTBITE_TRAP_MAX = 100
 
 local function endBarracuda(id, params)
     local player = core.get_player_by_name(params.pname)
@@ -32,13 +27,14 @@ local function endBarracuda(id, params)
         })
     end
 end
+local inWater = mahiko_spells.water.inWater
 
 mahiko_spells.registerFancySpell("barracuda", {
     groups = {mahiko_element = ELEMENT_INT},
     description = table.concat({
-        core.colorize(COLORS.WATER, "Barracuda"),
-        "Left-click: if on/under water, bolt towards where",
-        "you are facing 0.5 seconds for 3 seconds.",
+        COLORIZE(COLORS.WATER, "Barracuda"),
+        "Left-click: if on/under water, bolt forwards",
+        "every 0.5 seconds for 3 seconds.",
     }, "\n"),
     inventory_image = DEFAULT_SPELL_ICON,
     _use_duration = 3,
@@ -87,7 +83,7 @@ mahiko_spells.registerFancySpell("barracuda", {
 mahiko_spells.registerFancySpell("whirlpool", {
     groups = {mahiko_element = ELEMENT_INT},
     description = table.concat({
-        core.colorize(COLORS.WATER, "Whirlpool"),
+        COLORIZE(COLORS.WATER, "Whirlpool"),
         "Left-click on a object: sink the object downwards",
         "for 5 seconds.",
     }, "\n"),
@@ -137,7 +133,7 @@ mahiko_spells.registerFancySpell("whirlpool", {
 mahiko_spells.registerFancySpell("breathability", {
     groups = {mahiko_element = ELEMENT_INT},
     description = table.concat({
-        core.colorize(COLORS.WATER, "Breathability"),
+        COLORIZE(COLORS.WATER, "Breathability"),
         "Left-click: full breath underwater for 10 seconds.",
     }, "\n"),
     inventory_image = DEFAULT_SPELL_ICON,
@@ -177,7 +173,7 @@ mahiko_spells.registerFancySpell("breathability", {
 mahiko_spells.registerSimpleSpell("condenser", {
     groups = {mahiko_element = ELEMENT_INT},
     description = table.concat({
-        core.colorize(COLORS.WATER, "Condenser"),
+        COLORIZE(COLORS.WATER, "Condenser"),
         "Left-click on a node: place a block of water.",
     }, "\n"),
     inventory_image = DEFAULT_SPELL_ICON,
@@ -188,9 +184,72 @@ mahiko_spells.registerSimpleSpell("condenser", {
         end
 
         local pos = pointed_thing.above
-        if core.get_node(pos).name == "air" then
-            core.set_node(pos, {name = "default:water_source"})
+        return core.place_node(pos, {name = "default:water_source"})
+    end,
+})
+
+local function tryPowderedSnow(pos)
+    --core.set_node(pos, {name = "mahiko_spells:powdered_snow"})
+    core.place_node(pos, {name = "mahiko_spells:powdered_snow"})
+    local timer = core.get_node_timer(pos)
+    local timeout = math.random(FROSTBITE_TRAP_MIN, FROSTBITE_TRAP_MAX) / 10
+    timer:start(timeout)
+end
+
+mahiko_spells.registerSimpleSpell("frostbite", {
+    groups = {mahiko_element = ELEMENT_INT},
+    description = table.concat({
+        COLORIZE(COLORS.WATER, "Frostbite"),
+        "Left-click on a node/object: place powdered snow.",
+        "Right-click on a node: place a wall of powdered snow.",
+    }, "\n"),
+    inventory_image = DEFAULT_SPELL_ICON,
+    _cooldown = {8, 15},
+    on_use = function(itemstack, user, pointed_thing)
+        if pointed_thing.type == "node" then
+            tryPowderedSnow(pointed_thing.above)
+            return true
         end
+        if pointed_thing.type == "object" then
+            local ref = pointed_thing.ref
+            local pos = ref:get_pos()
+            pos = {
+                x = math.floor(pos.x),
+                y = math.floor(pos.y),
+                z = math.floor(pos.z),
+            }
+            tryPowderedSnow(pos)
+            pos.y = pos.y + 1
+            tryPowderedSnow(pos)
+        end
+    end,
+    _on_rightclick = function(itemstack, user, pointed_thing)
+        if pointed_thing.type ~= "node" then
+            return
+        end
+
+        local pos = pointed_thing.above
+
+        local positions = mahiko_spells.water.getNodes(user, pos, FROSTBITE_TRAP_WIDTH, FROSTBITE_TRAP_HEIGHT)
+        table.sort(positions, function(a, b)
+            return a.y < b.y
+        end)
+
+        for i, npos in ipairs(positions) do
+            core.after(0.25 * i, tryPowderedSnow, npos)
+        end
+
         return true
     end,
+})
+
+mahiko_spells.registerSimpleSpell("hydrodemolition", {
+    groups = {mahiko_element = ELEMENT_INT},
+    description = table.concat({
+        COLORIZE(COLORS.WATER, "Hydrodemolition"),
+        "If on a water source, launch a high-power,",
+        "high-damage stream of water.",
+    }, "\n"),
+    inventory_image = DEFAULT_SPELL_ICON,
+    _cooldown = 4,
 })

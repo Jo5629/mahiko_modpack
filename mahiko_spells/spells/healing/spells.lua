@@ -1,5 +1,6 @@
 local COLORS = mahiko_spells.COLORS
-local ELEMENT_INT = 5
+local COLORIZE = core.colorize
+local ELEMENT_INT = mahiko_spells.intFromCategory("healing")
 local DEFAULT_SPELL_ICON = "mahiko_spells_element_healing.png"
 local REPLENISHMENT_HP = 2 * 2
 local REJUVENATE_RADIUS = 3
@@ -12,7 +13,7 @@ local HEALING_SLAB_INTERVAL = 1.0
 mahiko_spells.registerSimpleSpell("replenishment", {
     groups = {mahiko_element = ELEMENT_INT},
     description = table.concat({
-        core.colorize(COLORS.HEALING, "Replenishment"),
+        COLORIZE(COLORS.HEALING, "Replenishment"),
         "Left-click: heal 2 hearts.",
     }, "\n"),
     inventory_image = DEFAULT_SPELL_ICON,
@@ -30,7 +31,7 @@ mahiko_spells.registerSimpleSpell("replenishment", {
 mahiko_spells.registerSimpleSpell("rejuvenate", {
     groups = {mahiko_element = ELEMENT_INT},
     description = table.concat({
-        core.colorize(COLORS.HEALING, "Rejuvenate"),
+        COLORIZE(COLORS.HEALING, "Rejuvenate"),
         "Left-click: heal the players in a three-block radius",
         "around you by 3 hearts.",
     }, "\n"),
@@ -55,7 +56,7 @@ mahiko_spells.registerSimpleSpell("rejuvenate", {
 mahiko_spells.registerSimpleSpell("vampire", {
     groups = {mahiko_element = ELEMENT_INT},
     description = table.concat({
-        core.colorize(COLORS.HEALING, "Vampire"),
+        COLORIZE(COLORS.HEALING, "Vampire"),
         "Left-click on an object: steal 3 HP for yourself.",
     }, "\n"),
     inventory_image = DEFAULT_SPELL_ICON,
@@ -83,7 +84,7 @@ mahiko_spells.registerSimpleSpell("vampire", {
 mahiko_spells.registerFancySpell("leech", {
     groups = {mahiko_element = ELEMENT_INT},
     description = table.concat({
-        core.colorize(COLORS.HEALING, "Leech"),
+        COLORIZE(COLORS.HEALING, "Leech"),
         "Left-click on a object: steal 2 HP from an object per",
         "second for 3 seconds.",
     }, "\n"),
@@ -153,7 +154,7 @@ end
 mahiko_spells.registerFancySpell("mobile_medkit", {
     groups = {mahiko_element = ELEMENT_INT},
     description = table.concat({
-        core.colorize(COLORS.HEALING, "Mobile Medkit"),
+        COLORIZE(COLORS.HEALING, "Mobile Medkit"),
         "Left-click: place a healing slab for 15 seconds.",
     }, "\n"),
     inventory_image = DEFAULT_SPELL_ICON,

@@ -95,7 +95,7 @@ core.register_entity("mahiko_spells:fired_up", {
         local newpos = ppos - offset
         newpos.y = ppos.y + 0.15
         if core.get_node(newpos).name == "air" then
-            core.set_node(newpos, {name = "fire:basic_flame"})
+            core.place_node(newpos, {name = "fire:basic_flame"})
         end
     end
 })

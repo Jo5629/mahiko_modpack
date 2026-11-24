@@ -1,5 +1,6 @@
 local COLORS = mahiko_spells.COLORS
-local ELEMENT_INT = 1
+local COLORIZE = core.colorize
+local ELEMENT_INT = mahiko_spells.intFromCategory("fire")
 local DEFAULT_SPELL_ICON = "mahiko_spells_element_fire.png"
 local HOTHANDS_DMG_INTERVAL = 1
 local HOTSTREAK_SPEED_MULT = 2.5
@@ -10,7 +11,7 @@ local FIREBALL_LIFETIME = 3
 mahiko_spells.registerFancySpell("hot_hands", {
     groups = {mahiko_element = ELEMENT_INT},
     description = table.concat({
-        core.colorize(COLORS.FIRE, "Hot Hands"),
+        COLORIZE(COLORS.FIRE, "Hot Hands"),
         "Left-click on a object: object takes fire damage",
         "for 6 seconds.",
     }, "\n"),
@@ -77,7 +78,7 @@ end
 mahiko_spells.registerFancySpell("hot_streak", {
     groups = {mahiko_element = ELEMENT_INT},
     description = table.concat({
-        core.colorize(COLORS.FIRE, "Hot Streak"),
+        COLORIZE(COLORS.FIRE, "Hot Streak"),
         "Left-click: increase your speed and leave a trail",
         "of fire behind as you run for 6 seconds.",
     }, "\n"),
@@ -111,7 +112,7 @@ mahiko_spells.registerFancySpell("hot_streak", {
 mahiko_spells.registerSimpleSpell("fireball", {
     groups = {mahiko_element = ELEMENT_INT},
     description = table.concat({
-        core.colorize(COLORS.FIRE, "Fireball"),
+        COLORIZE(COLORS.FIRE, "Fireball"),
     }, "\n"),
     inventory_image = DEFAULT_SPELL_ICON,
     _cooldown = 6,
@@ -129,4 +130,14 @@ mahiko_spells.registerSimpleSpell("fireball", {
             return true
         end
     end
+})
+
+mahiko_spells.registerSimpleSpell("firestorm", {
+    groups = {mahiko_element = ELEMENT_INT},
+    description = table.concat({
+        COLORIZE(COLORS.FIRE, "Firestorm"),
+        "Launch a fast-moving fire tornado that scorches",
+        "everything in its path."
+    }, "\n"),
+    inventory_image = DEFAULT_SPELL_ICON
 })
