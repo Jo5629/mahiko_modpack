@@ -1,3 +1,101 @@
+mahiko_utils = {}
+
+local WIDTH = 3
+local HEIGHT = 3
+
+local function GET_OFFSETS(w, h)
+    w = w or WIDTH
+    h = h or HEIGHT
+    local offset = (w - 1) / 2
+    return {
+        X = {
+            {x = offset, y = 0, z = 0},
+            {x = offset, y = h - 1, z = 0},
+        },
+        Z = {
+            {x = 0, y = 0, z = offset},
+            {x = 0, y = h - 1, z = offset},
+        },
+    }
+end
+
+function mahiko_utils.getNodes(player, pos, w, h, offsetFunc)
+    local wallOffsets = GET_OFFSETS(w, h)
+    if type(offsetFunc) == "function" then
+        wallOffsets = offsetFunc(w, h)
+    end
+
+    local offsets = {}
+    local cdir = mahiko_utils.getCardinalDirection(player)
+    if cdir == "N" or cdir == "S" then
+        offsets = wallOffsets.X
+    elseif cdir == "E" or cdir == "W" then
+        offsets = wallOffsets.Z
+    end
+
+    local positions = {}
+    local pos1 = vector.subtract(pos, offsets[1])
+    local pos2 = vector.add(pos, offsets[2])
+    for x = pos1.x, pos2.x do
+    for y = pos1.y, pos2.y do
+    for z = pos1.z, pos2.z do
+        local npos = vector.new(x, y, z)
+        table.insert(positions, npos)
+    end
+    end
+    end
+
+    return positions
+end
+
+function mahiko_utils.inWater(pos)
+    pos = {
+        x = math.ceil(pos.x),
+        y = math.ceil(pos.y),
+        z = math.ceil(pos.z),
+    }
+    local name = core.get_node(pos).name
+    return name:match("water")
+end
+
+function mahiko_utils.raycastOnContact(user, func)
+    local pos = user:get_pos()
+    local props = user:get_properties()
+    local dir = user:get_look_dir()
+    local yaw = user:get_look_horizontal()
+    pos.y = pos.y + props.eye_height*0.9
+    pos.x = pos.x + math.cos(yaw)/4
+    pos.z = pos.z + math.sin(yaw)/4
+
+    local range, density = 25, 5
+    for i=1, range * density do
+        core.add_particle({
+            pos = {x = pos.x + dir.x * i/density, y = pos.y + dir.y * i/density, z = pos.z + dir.z * i/density},
+            expirationtime = 0.35+i/5000,
+            size = 0.8,
+            vertical = false,
+            texture = "mahiko_spells_particle_microburst.png",
+            glow = 14,
+            jitter = {min = {x = -2, y = -2, z = -2}, max = {x = 2, y = 2, z = 2}}
+        })
+    end
+
+    local rayend = vector.add(pos, vector.multiply(dir, range))
+    local ray = Raycast(pos, rayend, true, false)
+    func(ray)
+end
+
+local pcg = PcgRandom(bit.bxor(math.random() * 0xFFFFFF, os.time()))
+function mahiko_utils.random(min, max)
+    if type(min) == "number" and not max then
+        max, min = min, 1
+    end
+    if min and max then
+        return pcg:next(min, max)
+    end
+    return pcg:next()
+end
+
 local WIDTH = 5 -- Must be an odd integer.
 local HEIGHT = 4
 local EARTH_GROUPS = {"mahiko_earth", "sand", "soil", "stone"} --"gravel"}
@@ -18,7 +116,7 @@ local function GET_OFFSETS(w, h)
     }
 end
 
-function mahiko_spells.earth.getCardinalDirection(player)
+function mahiko_utils.getCardinalDirection(player)
     local radians = player:get_look_horizontal()
     local degrees = math.deg(radians)
     local direction
@@ -34,10 +132,10 @@ function mahiko_spells.earth.getCardinalDirection(player)
     return direction
 end
 
-function mahiko_spells.earth.getFacingNodes(user, pointed_thing, w, h)
+function mahiko_utils.getFacingNodes(user, pointed_thing, w, h)
     local wallOffsets = GET_OFFSETS(w, h)
     local offsets = {}
-    local cdir = mahiko_spells.earth.getCardinalDirection(user)
+    local cdir = mahiko_utils.getCardinalDirection(user)
     if cdir == "N" or cdir == "S" then
         offsets = wallOffsets.X
     elseif cdir == "E" or cdir == "W" then
@@ -61,7 +159,7 @@ function mahiko_spells.earth.getFacingNodes(user, pointed_thing, w, h)
     return positions
 end
 
-function mahiko_spells.earth.placeNode(pos, node, placer)
+function mahiko_utils.placeNode(pos, node, placer)
     local oldnode = core.get_node_or_nil(pos)
     local oldnodeDef = oldnode and core.registered_nodes[oldnode.name]
     if not oldnode or not oldnodeDef.buildable_to then
@@ -79,7 +177,7 @@ local function isInGroup(name, group)
 end
 
 local cache = {}
-function mahiko_spells.earth.isEarthNode(pos)
+function mahiko_utils.isEarthNode(pos)
     local node = core.get_node_or_nil(pos)
     if not node then
         return false

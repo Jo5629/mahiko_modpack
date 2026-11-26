@@ -4,7 +4,7 @@ local cache = {}
 local function generateID()
     local num
     repeat
-        num = math.random(1, 9999999)
+        num = mahiko_utils.random(1, 9999999)
     until not cache[num]
     cache[num] = -1
     return num
@@ -56,24 +56,12 @@ local function updateWear(player, id, timeLeft, totalTime, listname, mode)
         return
     end
 
-    --local def = core.registered_tools[stack:get_name()]
-    --local cooldown = def._cooldown
-    --local use_duration = def._use_duration or cooldown
-
     local newWear = 0
     local percent = timeLeft / totalTime
     if mode == "up" then
         newWear = math.floor(65535 * percent)
     elseif mode == "down" then
         newWear = math.floor(65535 * (1 - percent))
-    end
-
-    local meta = stack:get_meta()
-    local color = meta:get_string("color")
-    if newWear == 0 then
-        meta:set_string("color", "")
-    elseif color == "" then
-        meta:set_string("color", "#E65E60")
     end
 
     stack:set_wear(newWear)

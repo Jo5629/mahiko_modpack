@@ -120,7 +120,7 @@ mahiko_spells.registerSimpleSpell("microburst", {
     inventory_image = DEFAULT_SPELL_ICON,
     _cooldown = 6,
     on_use = function(itemstack, user, _)
-        mahiko_spells.wind.raycastOnContact(user, function(ray)
+        mahiko_utils.raycastOnContact(user, function(ray)
             for pointed_thing in ray do
                 if pointed_thing.type ~= "object" then
                     goto continue
@@ -137,4 +137,14 @@ mahiko_spells.registerSimpleSpell("microburst", {
         end)
         return true
     end,
+})
+
+mahiko_spells.registerSimpleSpell("waldgose", {
+    groups = {mahiko_element = ELEMENT_INT},
+    description = table.concat({
+        COLORIZE(COLORS.WIND, "Waldgose"),
+        "Left-click: launch a tornado.",
+    }, "\n"),
+    inventory_image = DEFAULT_SPELL_ICON,
+    _cooldown = 6,
 })

@@ -6,7 +6,6 @@ local function cancelAllSpells(inv, listname)
             local id = meta:get_int("mahiko_spells:id")
             if id > 0 and cooldowns:exists(id) then
                 cooldowns:cancel(id)
-                meta:set_string("color", "")
                 stack:set_wear(0)
                 inv:set_stack(listname, i, stack)
             end

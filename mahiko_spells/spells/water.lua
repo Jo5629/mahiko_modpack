@@ -28,7 +28,7 @@ local function endBarracuda(id, params)
         })
     end
 end
-local inWater = mahiko_spells.water.inWater
+local inWater = mahiko_utils.inWater
 
 mahiko_spells.registerFancySpell("barracuda", {
     groups = {mahiko_element = ELEMENT_INT},
@@ -124,7 +124,7 @@ mahiko_spells.registerFancySpell("whirlpool", {
         params.interval = WHIRLPOOL_VEL_INTERVAL
 
         if inWater(object:get_pos()) then
-            local y = math.random(WHIRLPOOL_VEL_YMIN, WHIRLPOOL_VEL_YMAX)
+            local y = mahiko_utils.random(WHIRLPOOL_VEL_YMIN, WHIRLPOOL_VEL_YMAX)
             object:add_velocity({x = 0, y = y, z = 0})
         end
         return params
@@ -190,9 +190,9 @@ mahiko_spells.registerSimpleSpell("condenser", {
 })
 
 local function tryPowderedSnow(pos, placer)
-    if mahiko_spells.earth.placeNode(pos, FROSTBITE_NODE, placer) then
+    if mahiko_utils.placeNode(pos, FROSTBITE_NODE, placer) then
         local timer = core.get_node_timer(pos)
-        local timeout = math.random(FROSTBITE_TRAP_MIN, FROSTBITE_TRAP_MAX) / 10
+        local timeout = mahiko_utils.random(FROSTBITE_TRAP_MIN, FROSTBITE_TRAP_MAX) / 10
         timer:start(timeout)
     end
 end
@@ -230,7 +230,7 @@ mahiko_spells.registerSimpleSpell("frostbite", {
         end
 
         local pos = pointed_thing.above
-        local positions = mahiko_spells.water.getNodes(user, pos, FROSTBITE_TRAP_WIDTH, FROSTBITE_TRAP_HEIGHT)
+        local positions = mahiko_utils.getNodes(user, pos, FROSTBITE_TRAP_WIDTH, FROSTBITE_TRAP_HEIGHT)
         table.sort(positions, function(a, b)
             return a.y < b.y
         end)
@@ -252,4 +252,22 @@ mahiko_spells.registerSimpleSpell("hydrodemolition", {
     }, "\n"),
     inventory_image = DEFAULT_SPELL_ICON,
     _cooldown = 4,
+})
+
+mahiko_spells.registerSimpleSpell("nepthear", {
+    groups = {mahiko_element = ELEMENT_INT},
+    description = table.concat({
+        COLORIZE(COLORS.WATER, "Nepthear"),
+        "Left-click: summon spears of ice and launch them."
+    }, "\n"),
+    inventory_image = DEFAULT_SPELL_ICON,
+})
+
+mahiko_spells.registerSimpleSpell("reamstroha", {
+    groups = {mahiko_element = ELEMENT_INT},
+    description = table.concat({
+        COLORIZE(COLORS.WATER, "Reamstroha"),
+        "Left-click: launch a large sphere of water."
+    }, "\n"),
+    inventory_image = DEFAULT_SPELL_ICON,
 })

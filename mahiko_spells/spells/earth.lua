@@ -68,7 +68,7 @@ mahiko_spells.registerSimpleSpell("hurler", {
             return
         end
 
-        local isEarthNode = mahiko_spells.earth.isEarthNode(pointed_thing.under)
+        local isEarthNode = mahiko_utils.isEarthNode(pointed_thing.under)
         if isEarthNode then
             core.chat_send_player(name, "Selected node to throw.")
             posCache[name] = pointed_thing.under
@@ -119,7 +119,7 @@ mahiko_spells.registerSimpleSpell("masonry", {
             return
         end
 
-        for oldpos, node in pairs(mahiko_spells.earth.getFacingNodes(user, pointed_thing)) do
+        for oldpos, node in pairs(mahiko_utils.getFacingNodes(user, pointed_thing)) do
             oldpos.y = oldpos.y + MASONRY_HEIGHT
             core.place_node(oldpos, node)
         end
@@ -148,7 +148,7 @@ mahiko_spells.registerSimpleSpell("excavator", {
         for y = pos2.y, pos1.y, -1 do
         for x = pos2.x, pos1.x, -1 do
             local pos = vector.new(x, y, z)
-            if mahiko_spells.earth.isEarthNode(pos) then
+            if mahiko_utils.isEarthNode(pos) then
                 core.dig_node(pos)
             end
         end
@@ -183,10 +183,10 @@ mahiko_spells.registerSimpleSpell("contaminator", {
         for z = pos1.z, pos2.z do
             local npos = vector.new(x, y, z)
             core.after(0.025 * i, function(npos, placer)
-                local success = mahiko_spells.earth.placeNode(pos, {name = CONTAMINATED_DIRT}, placer)
+                local success = mahiko_utils.placeNode(pos, {name = CONTAMINATED_DIRT}, placer)
                 if success then
                     local timer = core.get_node_timer(npos)
-                    local timeout = math.random(CONTAMINATOR_TRAP_MIN, CONTAMINATOR_TRAP_MAX) / 10
+                    local timeout = mahiko_utils.random(CONTAMINATOR_TRAP_MIN, CONTAMINATOR_TRAP_MAX) / 10
                     timer:start(timeout)
                 end
             end, npos, user)
@@ -205,7 +205,7 @@ mahiko_spells.registerSimpleSpell("contaminator", {
         local success = core.place_node(pos, {name = CONTAMINATED_DIRT})
         if success then
             local timer = core.get_node_timer(pos)
-            local timeout = math.random(CONTAMINATOR_PLACE_MIN, CONTAMINATOR_PLACE_MAX) / 10
+            local timeout = mahiko_utils.random(CONTAMINATOR_PLACE_MIN, CONTAMINATOR_PLACE_MAX) / 10
             timer:start(timeout)
             return true
         end
@@ -227,14 +227,14 @@ mahiko_spells.registerSimpleSpell("molerat", {
         end
 
         local start = pointed_thing.under
-        local cDir = mahiko_spells.earth.getCardinalDirection(user)
+        local cDir = mahiko_utils.getCardinalDirection(user)
         if not cDir then
             return
         end
         local nodeDir = MOLERAT_DIRECTIONS[cDir]
         for i = 0, MOLERAT_HORIZ_DIST - 1 do
             local pos = start - nodeDir * i
-            if mahiko_spells.earth.isEarthNode(pos) then
+            if mahiko_utils.isEarthNode(pos) then
                 core.dig_node(pos)
             else
                 break
@@ -250,7 +250,7 @@ mahiko_spells.registerSimpleSpell("molerat", {
         local start = pointed_thing.under
         for i = 0, MOLERAT_VERTI_DIST - 1 do
             local pos = start - vector.new(0, i, 0)
-            if mahiko_spells.earth.isEarthNode(pos) then
+            if mahiko_utils.isEarthNode(pos) then
                 core.dig_node(pos)
             else
                 break
@@ -258,6 +258,24 @@ mahiko_spells.registerSimpleSpell("molerat", {
         end
         return true
     end,
+})
+
+mahiko_spells.registerSimpleSpell("doragate", {
+    groups = {mahiko_element = ELEMENT_INT},
+    description = table.concat({
+        COLORIZE(COLORS.EARTH, "Doragate"),
+        "Left-click: launch rocks as bullets."
+    }, "\n"),
+    inventory_image = DEFAULT_SPELL_ICON,
+})
+
+mahiko_spells.registerSimpleSpell("bargland", {
+    groups = {mahiko_element = ELEMENT_INT},
+    description = table.concat({
+        COLORIZE(COLORS.EARTH, "Bargland"),
+        "Left-click: form a large wall from the ground."
+    }, "\n"),
+    inventory_image = DEFAULT_SPELL_ICON,
 })
 
 --[[ USE THIS IN THE FUTURE?
@@ -276,10 +294,10 @@ on_use = function(itemstack, user, pointed_thing)
 
     local dir = vector.direction(user:get_pos(), pointed_thing.under)
     dir.y = 0
-    for oldpos, node in pairs(mahiko_spells.earth.getFacingNodes(user, pointed_thing)) do
+    for oldpos, node in pairs(mahiko_utils.getFacingNodes(user, pointed_thing)) do
         oldpos.y = oldpos.y + 4
         core.set_node(oldpos, node)
-        local speed = math.random(15, 20)
+        local speed = mahiko_utils.random(15, 20)
         propel(oldpos, node, vector.multiply(dir, speed))
     end
     return true

@@ -32,10 +32,7 @@ dofile(MP .. "/entities.lua")
 
 for _, spell in ipairs(mahiko_spells.ELEMENTS) do
     mahiko_spells.registerCategory(spell)
-    mahiko_spells[spell] = {}
-    local spellMP = MP .. "/spells/" .. spell
-    dofile(spellMP .. "/helpers.lua")
-    dofile(spellMP .. "/spells.lua")
+    dofile(MP .. "/spells/" .. spell .. ".lua")
 end
 
 dofile(MP .. "/player.lua")

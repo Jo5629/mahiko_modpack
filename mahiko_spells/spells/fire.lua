@@ -132,12 +132,20 @@ mahiko_spells.registerSimpleSpell("fireball", {
     end
 })
 
-mahiko_spells.registerSimpleSpell("firestorm", {
+mahiko_spells.registerSimpleSpell("daosdorg", {
     groups = {mahiko_element = ELEMENT_INT},
     description = table.concat({
-        COLORIZE(COLORS.FIRE, "Firestorm"),
-        "Launch a fast-moving fire tornado that scorches",
-        "everything in its path."
+        COLORIZE(COLORS.FIRE, "Daosdorg"),
+        "Left-click: launch a tornado of fire."
     }, "\n"),
-    inventory_image = DEFAULT_SPELL_ICON
+    inventory_image = DEFAULT_SPELL_ICON,
+})
+
+mahiko_spells.registerSimpleSpell("volizanbel", {
+    groups = {mahiko_element = ELEMENT_INT},
+    description = table.concat({
+        COLORIZE(COLORS.FIRE, "Volizanbel"),
+        "Left-click: launch a large blast of fire."
+    }, "\n"),
+    inventory_image = DEFAULT_SPELL_ICON,
 })
